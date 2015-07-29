@@ -27,10 +27,8 @@
     "ext-curl": "*"
   },
   "autoload": {
-    "psr-4": {
-      "Edfa3ly\\DirectPay\\": [
-        "src/"
-      ]
+    "psr-0": {
+      "Edfa3ly\\DirectPay": "src/"
     }
   },
   "extra": {
