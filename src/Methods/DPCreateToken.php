@@ -6,11 +6,11 @@
  * Time: 10:50 AM
  */
 
-namespace Edfa3ly\DirectPayBundle\DirectPay\Methods;
+namespace Edfa3ly\DirectPay\Methods;
 
 
-use Edfa3ly\DirectPayBundle\DirectPay\DirectPayException;
-use Edfa3ly\DirectPayBundle\DirectPay\DirectPayRequest;
+use Edfa3ly\DirectPay\DirectPayException;
+use Edfa3ly\DirectPay\DirectPayRequest;
 
 class DPCreateToken extends DirectPayRequest
 {

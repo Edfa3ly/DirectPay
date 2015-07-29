@@ -6,7 +6,7 @@
  * Time: 10:28 AM
  */
 
-namespace Edfa3ly\DirectPayBundle\DirectPay;
+namespace Edfa3ly\DirectPay;
 
 
 class DirectPayException extends \Exception

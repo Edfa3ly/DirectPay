@@ -6,10 +6,10 @@
  * Time: 3:15 PM
  */
 
-namespace Edfa3ly\DirectPayBundle\DirectPay\Methods;
+namespace Edfa3ly\DirectPay\Methods;
 
 
-use Edfa3ly\DirectPayBundle\DirectPay\DirectPayRequest;
+use Edfa3ly\DirectPay\DirectPayRequest;
 
 class DPGetServices extends DirectPayRequest
 {

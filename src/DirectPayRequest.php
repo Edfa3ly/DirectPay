@@ -6,7 +6,7 @@
  * Time: 10:52 AM
  */
 
-namespace Edfa3ly\DirectPayBundle\DirectPay;
+namespace Edfa3ly\DirectPay;
 
 
 use Buzz\Browser;

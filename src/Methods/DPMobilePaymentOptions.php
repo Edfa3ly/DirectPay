@@ -6,12 +6,12 @@
  * Time: 5:21 PM
  */
 
-namespace Edfa3ly\DirectPayBundle\DirectPay\Methods;
+namespace Edfa3ly\DirectPay\Methods;
 
 
 use Buzz\Message\Response;
-use Edfa3ly\DirectPayBundle\DirectPay\DirectPayException;
-use Edfa3ly\DirectPayBundle\DirectPay\DirectPayRequest;
+use Edfa3ly\DirectPay\DirectPayException;
+use Edfa3ly\DirectPay\DirectPayRequest;
 
 class DPMobilePaymentOptions extends DirectPayRequest
 {
