@@ -1,7 +1,12 @@
 {
-  "name": "Edfa3ly/direct-pay",
+  "name": "edfa3ly/direct-pay",
   "description": "3G direct pay",
-  "keywords": ["directpay", "3g", "payment", "mobile"],
+  "keywords": [
+    "directpay",
+    "3g",
+    "payment",
+    "mobile"
+  ],
   "homepage": "https://github.com/SalmaAbdelhady/DirectPay",
   "type": "library",
   "license": "MIT",
@@ -9,7 +14,8 @@
     {
       "name": "Salma Abdelhady",
       "email": "salma.abdelhady@edfa3ly.com.eg",
-      "homepage": "https://github.com/SalmaAbdelhady"
+      "homepage": "https://github.com/SalmaAbdelhady",
+      "role": "Developer"
     }
   ],
   "require": {
@@ -17,16 +23,19 @@
   },
   "require-dev": {
     "symfony/var-dumper": "~2.3",
-    "kriswallsmith/buzz":">=0.7"
+    "kriswallsmith/buzz": ">=0.7",
+    "ext-curl": "*"
   },
   "autoload": {
     "psr-4": {
-      "Edfa3ly\\DirectPay\\": [ "src/"]
+      "Edfa3ly\\DirectPay\\": [
+        "src/"
+      ]
     }
   },
   "extra": {
     "branch-alias": {
-      "dev-master": "0.1x-dev"
+      "dev-master": "1.x-dev"
     }
   }
 }
