@@ -40,7 +40,7 @@ class DPMobilePaymentOptions extends DirectPayRequest
      * @param Response $response
      * @return array
      */
-    protected function parseXMLResponse(Response $response)
+    protected function parseXMLResponse($response)
     {
         $xmlResponse = new \SimpleXmlElement($response, LIBXML_NOCDATA);
         $options = $this->xmlElementToArray($xmlResponse->asXML(), 'mobileoption');
