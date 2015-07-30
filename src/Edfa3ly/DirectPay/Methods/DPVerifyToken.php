@@ -11,9 +11,47 @@ namespace Edfa3ly\DirectPay\Methods;
 
 use Edfa3ly\DirectPay\DirectPayException;
 use Edfa3ly\DirectPay\DirectPayRequest;
+use Edfa3ly\DirectPay\DirectPayVerifyTokenResponse;
 
 class DPVerifyToken extends DirectPayRequest
 {
+    //transaction related
+    CONST PASSED_PTL                = 903;
+    CONST TRANSACTION_CANCELLED     = 902;
+    CONST MISSING_TRANSACTION_TOKEN = 950;
+    CONST MISSING_VERIFY_TOKEN      = 951;
+    CONST NOT_PAID_YET              = 900;
+    CONST DECLINED                  = 901;
+    CONST NO_TRANSACTION            = 904;
+    //FRAUD related
+    CONST FRAUD_DETECTED_ACTION_REQUIRED = 001;
+    CONST FRAUD_DETECTED_ACTION_TAKEN    = 002;
+
+    public static $FRAUDS
+        = [
+            self::FRAUD_DETECTED_ACTION_REQUIRED,
+            self::FRAUD_DETECTED_ACTION_TAKEN
+        ];
+
+
+    public static $TRANSACTION_ERRORS
+        = [
+            self::REQUEST_MISSING_COMPANY_TOKEN,
+            self::COMPANY_TOKEN_DOEST_EXIST,
+            self::NO_REQUEST,
+            self::ERROR_IN_XML,
+            self::REQUEST_MISSING_COMPANY_TOKEN,
+            self::COMPANY_TOKEN_DOEST_EXIST,
+            self::NO_REQUEST,
+            self::ERROR_IN_XML,
+            self::PASSED_PTL,
+            self::TRANSACTION_CANCELLED,
+            self::MISSING_TRANSACTION_TOKEN,
+            self::MISSING_VERIFY_TOKEN,
+            self::DECLINED,
+            self::NOT_PAID_YET,
+            self::NO_TRANSACTION
+        ];
 
     /**
      * @param $token
@@ -23,18 +61,23 @@ class DPVerifyToken extends DirectPayRequest
     public function verifyToken($token)
     {
         $this->requestName = 'verifyToken';
-        $response          = $this->sendRequest(array('TransactionToken'=>$token));
+        $response          = $this->sendRequest(array('TransactionToken' => $token));
 
-
+        /** @var DirectPayVerifyTokenResponse $directPayResponse */
         $directPayResponse = $this->parseXMLResponse($response);
 
-        if (in_array($directPayResponse->getResult(), DPCreateToken::$TOKEN_CREATION_ERRORS)
+        if (in_array($directPayResponse->getResult(), self::$TRANSACTION_ERRORS)
         ) {
             throw new DirectPayException($directPayResponse);
         }
-        return $directPayResponse->getTransToken();
-    }
 
+        if (in_array($directPayResponse->getFraudAlert(), self::$FRAUDS)
+        ) {
+            throw new DirectPayException($directPayResponse, $directPayResponse->getFraudExplanation(), $directPayResponse->getFraudAlert());
+        }
+
+        return $directPayResponse;
+    }
 
 
     /**
@@ -45,26 +88,21 @@ class DPVerifyToken extends DirectPayRequest
     {
 
         $xmlResponse = new \SimpleXmlElement($response, LIBXML_NOCDATA);
-        
-        $p = xml_parser_create();
-        xml_parse_into_struct($p, $xmlResponse->asXML(), $values, $indexes);
-        xml_parser_free($p);
 
         $dom = new \DOMDocument();
         $dom->loadXML($xmlResponse->asXML());
-        $fields   = $dom->getElementsByTagName('Service');
-        $services = array();
 
-        /** @var \DOMElement $field */
-        foreach ($fields as $field) {
-            $node = array();
-            /** @var \DOMElement $child */
-            foreach ($field->childNodes as $child) {
-                $node[$child->nodeName] = $child->nodeValue;
-            }
-            $services[] = $node;
-        }
+        $DPResponse = new DirectPayVerifyTokenResponse();
 
-        return $services;
+        $DPResponse->setResultExplanation($dom->getElementsByTagName('ResultExplanation')->item(0)->nodeValue);
+        $DPResponse->setResult($dom->getElementsByTagName('Result')->item(0)->nodeValue);
+        $DPResponse->setTransactionAmount($dom->getElementsByTagName('TransactionAmount')->item(0)->nodeValue);
+        $DPResponse->setTransactionCurrency($dom->getElementsByTagName('TransactionCurrency')->item(0)->nodeValue);
+        $DPResponse->setTransactionApproval($dom->getElementsByTagName('TransactionApproval')->item(0)->nodeValue);
+        $DPResponse->setFraudAlert($dom->getElementsByTagName('FraudAlert')->item(0)->nodeValue);
+        $DPResponse->setFraudExplanation($dom->getElementsByTagName('FraudExplnation')->item(0)->nodeValue);
+
+
+        return $DPResponse;
     }
 }

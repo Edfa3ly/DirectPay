@@ -14,8 +14,14 @@ use Edfa3ly\DirectPay\DirectPayResponse;
 class DirectPayException extends \Exception
 {
 
-    public function __construct(DirectPayResponse $data)
+    public function __construct(DirectPayResponse $data, $message = null, $code = null)
     {
-        parent::__construct(sprintf('%s ,code = %s', $data->getResultExplanation(), $data->getResult(), $data->getResult()),$data->getResult());
+        if (!$message) {
+            $message = sprintf('%s ,code = %s', $data->getResultExplanation(), $data->getResult(), $data->getResult());
+        }
+        if (!$code) {
+            $code = $data->getResult();
+        }
+        parent::__construct($message, $code);
     }
 }

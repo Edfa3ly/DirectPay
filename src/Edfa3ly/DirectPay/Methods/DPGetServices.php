@@ -31,13 +31,7 @@ class DPGetServices extends DirectPayRequest
     protected function parseXMLResponse($response)
     {
         $xmlResponse = new \SimpleXmlElement($response, LIBXML_NOCDATA);
-
-        $p = xml_parser_create();
-        xml_parse_into_struct($p, $xmlResponse->asXML(), $values, $indexes);
-        xml_parser_free($p);
-
         $services = $this->xmlElementToArray($xmlResponse->asXML(),'Service');
-
         return $services;
     }
 

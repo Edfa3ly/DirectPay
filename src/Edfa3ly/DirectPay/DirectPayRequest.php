@@ -15,6 +15,11 @@ use Buzz\Message\Response;
 
 class DirectPayRequest
 {
+    CONST REQUEST_MISSING_COMPANY_TOKEN = 801;
+    CONST COMPANY_TOKEN_DOEST_EXIST     = 802;
+    CONST NO_REQUEST                    = 803;
+    CONST ERROR_IN_XML                  = 804;
+
 
     protected $config;
     protected $companyRef;
@@ -44,11 +49,12 @@ class DirectPayRequest
         $xml->addChild('CompanyToken', $this->companyRef);
         $xml->addChild('Request', $this->requestName);
         $this->toXML($xml, $payload);
-        $cURL = $this->initCurl($xml->asXML());
+        $cURL     = $this->initCurl($xml->asXML());
         $browser  = new Browser($cURL);
         $response = $browser->post($this->apiURL);
         $this->verifyResponse($response);
-        return $response;
+
+        return $response->getContent();
     }
 
 
@@ -60,7 +66,8 @@ class DirectPayRequest
         $ch = new Curl();
 
         $ch->setOption(CURLOPT_URL, $this->apiURL);
-        $ch->setOption(CURLOPT_HEADER, 0);
+        $ch->setOption(CURLOPT_HEADER, 1);
+        $ch->setOption(CURLOPT_VERBOSE, 0);
         $ch->setOption(CURLOPT_SSL_VERIFYHOST, 0); //ssl stuff
         $ch->setOption(CURLOPT_SSL_VERIFYPEER, 0);
         $ch->setOption(CURLOPT_POST, 1);
@@ -95,25 +102,18 @@ class DirectPayRequest
      * @param $response
      * @return DirectPayResponse
      */
-    protected function parseXMLResponse(Response $response)
+    protected function parseXMLResponse($response)
     {
         $xmlResponse = new \SimpleXmlElement($response, LIBXML_NOCDATA);
-        $p           = xml_parser_create();
-        xml_parse_into_struct($p, $xmlResponse->asXML(), $values);
-        xml_parser_free($p);
+
+        $dom = new \DOMDocument();
+        $dom->loadXML($xmlResponse->asXML());
 
         $DPResponse = new DirectPayResponse();
-        foreach ($values as $key => $value) {
-            if ($value['tag'] == 'RESULT') {
-                $DPResponse->setResult($value['value']);
-            }
-            if ($value['tag'] == 'RESULTEXPLANATION') {
-                $DPResponse->setResultExplanation($value['value']);
-            }
-            if ($value['tag'] == 'TRANSTOKEN') {
-                $DPResponse->setTransToken($value['value']);
-            }
-        }
+
+        $DPResponse->setResultExplanation($dom->getElementsByTagName('ResultExplanation')->item(0)->nodeValue);
+        $DPResponse->setResult($dom->getElementsByTagName('Result')->item(0)->nodeValue);
+        $DPResponse->setTransToken($dom->getElementsByTagName('TransToken')->item(0)->nodeValue);
 
         return $DPResponse;
     }
@@ -141,8 +141,8 @@ class DirectPayRequest
     {
         $dom = new \DOMDocument();
         $dom->loadXML($xml);
-        $fields   = $dom->getElementsByTagName($name);
-        $data = array();
+        $fields = $dom->getElementsByTagName($name);
+        $data   = array();
 
         /** @var \DOMElement $field */
         foreach ($fields as $field) {
@@ -153,6 +153,7 @@ class DirectPayRequest
             }
             $data[] = $node;
         }
+
         return $data;
     }
 }
