@@ -29,7 +29,6 @@ class DPVerifyToken extends DirectPayRequest
 
     public static $FRAUDS
         = [
-            self::FRAUD_DETECTED_ACTION_REQUIRED,
             self::FRAUD_DETECTED_ACTION_TAKEN
         ];
 
